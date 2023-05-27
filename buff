@@ -1,0 +1,57 @@
+import sys
+import os
+import random
+import json
+import numpy
+from PIL import Image
+from tinygrad.tensor import Tensor
+from tinygrad.nn.optim import SGD
+from examples.yolo.kinne import KinneDir
+from examples.yolo.waifu2x import image_load, image_save, Vgg7
+
+# amount of context erased by model
+CONTEXT = 7
+
+def get_sample_count(samples_dir):
+  try:
+    samples_dir_count_file = open(samples_dir + "/sample_count.txt", "r")
+    v = samples_dir_count_file.readline()
+    samples_dir_count_file.close()
+    return int(v)
+  except:
+    return 0
+
+def set_sample_count(samples_dir, sc):
+  with open(samples_dir + "/sample_count.txt", "w") as file:
+    file.write(str(sc) + "\n")
+
+if len(sys.argv) < 2:
+  print("python3 -m examples.vgg7 import MODELJSON MODELDIR")
+  print(" imports a waifu2x JSON vgg_7 model, i.e. waifu2x/models/vgg_7/art/scale2.0x_model.json")
+  print(" into a directory of float binaries along with a meta.txt file containing tensor sizes")
+  print(" weight tensors are ordered in tinygrad/ncnn form, as so: (outC,inC,H,W)")
+  print(" *this format is used by all other commands in this program*")
+  print("python3 -m examples.vgg7 execute MODELDIR IMG_IN IMG_OUT")
+  print(" given an already-nearest-neighbour-scaled image, runs vgg7 on it")
+  print(" output image has 7 pixels removed on all edges")
+  print(" do not run on large images, will have *hilarious* RAM use")
+  print("python3 -m examples.vgg7 execute_full MODELDIR IMG_IN IMG_OUT")
+  print(" does the 'whole thing' (padding, tiling)")
+  print(" safe for large images, etc.")
+  print("python3 -m examples.vgg7 new MODELDIR")
+  print(" creates a new model (experimental)")
+  print("python3 -m examples.vgg7 train MODELDIR SAMPLES_DIR ROUNDS ROUNDS_SAVE")
+  print(" trains a model (experimental)")
+  print(" (how experimental? well, every time I tried it, it flooded w/ NaNs)")
+  print(" note: ROUNDS < 0 means 'forever'. ROUNDS_SAVE <= 0 is not a good idea.")
+  print(" expects roughly execute's input as SAMPLES_DIR/IDXa.png")
+  print(" expects roughly execute's output as SAMPLES_DIR/IDXb.png")
+  print(" (i.e. my_samples/0a.png is the first pre-nearest-scaled image,")
+  print("       my_samples/0b.png is the first original image)")
+  print(" in addition, SAMPLES_DIR/samples_count.txt indicates sample count")
+  print(" won't pad or tile, so keep image sizes sane")
+  print("python3 -m examples.vgg7 samplify IMG_A IMG_B SAMPLES_DIR SIZE")
+  print(" creates overlapping micropatches (SIZExSIZE w/ 7-pixel border) for training")
+  print(" maintains/creates samples_count.txt automatically")
+  print(" unlike training, IMG_A must be exactly half the size of IMG_B")
+  sys.exit(1)
