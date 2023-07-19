@@ -1,7 +1,5 @@
 import json
 import os
-
-
 DATAS_CONFIG = "./loader/datas.json"
 
 
