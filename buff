@@ -20,7 +20,6 @@ def get_sample_count(samples_dir):
     return int(v)
   except:
     return 0
-
 def set_sample_count(samples_dir, sc):
   with open(samples_dir + "/sample_count.txt", "w") as file:
     file.write(str(sc) + "\n")
@@ -41,7 +40,6 @@ if len(sys.argv) < 2:
   print("python3 -m examples.vgg7 new MODELDIR")
   print(" creates a new model (experimental)")
   print("python3 -m examples.vgg7 train MODELDIR SAMPLES_DIR ROUNDS ROUNDS_SAVE")
-  print(" trains a model (experimental)")
   print(" (how experimental? well, every time I tried it, it flooded w/ NaNs)")
   print(" note: ROUNDS < 0 means 'forever'. ROUNDS_SAVE <= 0 is not a good idea.")
   print(" expects roughly execute's input as SAMPLES_DIR/IDXa.png")
